@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SISTEM AUDIT PERFORMA TRADING</title>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2433;
+    --border-active: #2a3450;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --red: #ef4444;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --orange: #f97316;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --mono: 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0d1117 0%, #111827 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .session-meta {
+    display: flex;
+    gap: 16px;
+  }
+  .meta-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .meta-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 6px 10px;
+    width: 160px;
+    font-family: var(--mono);
+  }
+  .meta-input:focus { outline: none; border-color: var(--accent); }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .tab-btn:hover { background: var(--surface2); color: var(--text-dim); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* MAIN CONTENT */
+  .main { padding: 24px 32px; max-width: 1100px; margin: 0 auto; }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-number {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 6px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 4px 9px;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+  .section-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--border-active); }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-label .required { color: var(--red); font-size: 14px; }
+
+  textarea, input[type="text"], select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 10px 12px;
+    width: 100%;
+    resize: vertical;
+    transition: border-color 0.15s;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  textarea:focus, input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #131822;
+  }
+  textarea { min-height: 80px; }
+  textarea.tall { min-height: 110px; }
+
+  select option { background: var(--surface2); }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* TOGGLE GROUP */
+  .toggle-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .toggle-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+  .toggle-btn.selected-yes { background: rgba(34,197,94,0.15); border-color: var(--green); color: var(--green); }
+  .toggle-btn.selected-no { background: rgba(239,68,68,0.15); border-color: var(--red); color: var(--red); }
+  .toggle-btn.selected-neutral { background: rgba(234,179,8,0.15); border-color: var(--yellow); color: var(--yellow); }
+  .toggle-btn.selected-accent { background: rgba(59,130,246,0.15); border-color: var(--accent); color: var(--accent); }
+
+  /* BIAS CHECKLIST */
+  .bias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
+  .bias-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 10px 14px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+  .bias-item:hover { border-color: var(--border-active); }
+  .bias-item.active { background: rgba(239,68,68,0.12); border-color: var(--red); color: var(--red); }
+  .bias-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .bias-item.active .bias-dot { background: var(--red); }
+
+  /* VERDICT */
+  .verdict-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .verdict-option {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .verdict-option:hover { border-color: var(--border-active); }
+  .verdict-option.selected { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+  .verdict-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .verdict-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* SCORE */
+  .score-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .score-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+  .score-value { font-size: 32px; font-weight: 800; font-family: var(--mono); color: var(--accent); }
+  .score-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 22px;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-secondary { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--border-active); color: var(--text); }
+  .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn-success { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .btn-success:hover { background: rgba(34,197,94,0.25); }
+
+  /* EXPORT PANEL */
+  .export-area {
+    background: #060810;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: #7dd3fc;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 20px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* STATUS BADGE */
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+  }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(234,179,8,0.15); color: var(--yellow); }
+
+  /* PATTERN ALERT */
+  .pattern-alert {
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-left: 3px solid var(--red);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: #fca5a5;
+    line-height: 1.5;
+  }
+
+  /* HINT */
+  .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 20px;
+  }
+  .progress-seg {
+    height: 3px;
+    border-radius: 2px;
+    flex: 1;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .progress-seg.done { background: var(--accent); }
+
+  @media (max-width: 700px) {
+    .header { padding: 16px; }
+    .main { padding: 16px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .verdict-grid { grid-template-columns: 1fr; }
+    .session-meta { flex-wrap: wrap; }
+    .meta-input { width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">📊</div>
+      <div>
+        <div class="logo-text">Trading Audit System</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Sistem Analisis Performa Trading — v2.0</div>
+      </div>
+    </div>
+    <div class="session-meta">
+      <div class="meta-field">
+        <div class="meta-label">Tanggal</div>
+        <input class="meta-input" type="date" id="tradeDate">
+      </div>
+      <div class="meta-field">
+        <div class="meta-label">ID Sesi</div>
+        <input class="meta-input" type="text" id="sessionId" placeholder="TRD-001">
+      </div>
+    </div>
+  </div>
+  <div class="nav-tabs" id="navTabs">
+    <button class="tab-btn active" onclick="goTo(0)">① Konteks</button>
+    <button class="tab-btn" onclick="goTo(1)">② Eksekusi</button>
+    <button class="tab-btn" onclick="goTo(2)">③ Psikologi</button>
+    <button class="tab-btn" onclick="goTo(3)">④ Performa</button>
+    <button class="tab-btn" onclick="goTo(4)">⑤ Validasi Edge</button>
+    <button class="tab-btn" onclick="goTo(5)">⑥ Pola</button>
+    <button class="tab-btn" onclick="goTo(6)">⑦ Peta Kekuatan</button>
+    <button class="tab-btn" onclick="goTo(7)">⑧ Koreksi</button>
+    <button class="tab-btn" onclick="goTo(8)">⑨ Verdict</button>
+    <button class="tab-btn" onclick="goTo(9)">⑩ Export</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- SECTION 1: TRADE CONTEXT -->
+  <div class="section active" id="sec0">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <span class="section-title">KONTEKS TRADE</span>
+      <span class="section-desc">Trade Context</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Instrumen yang Diperdagangkan</div>
+        <input type="text" id="instrument" placeholder="Contoh: XAUUSD, EUR/USD, BTC/USDT, BBCA...">
+        <div class="hint">Tulis simbol persis. Jangan tulis 'emas' atau 'forex'.</div>
+      </div>
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Sesi Trading</div>
+        <div class="toggle-group" id="sessionToggle">
+          <button class="toggle-btn" onclick="selectToggle('sessionToggle', this, 'neutral')">Asia</button>
+          <button class="toggle-btn" onclick="selectToggle('sessionToggle', this, 'neutral')">London</button>
+          <button class="toggle-btn" onclick="selectToggle('sessionToggle', this, 'neutral')">New York</button>
+          <button class="toggle-btn" onclick="selectToggle('sessionToggle', this, 'neutral')">London-NY Overlap</button>
+          <button class="toggle-btn" onclick="selectToggle('sessionToggle', this, 'neutral')">Pre-Market</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Kondisi Pasar</div>
+      <div class="toggle-group" id="marketToggle">
+        <button class="toggle-btn" onclick="selectToggle('marketToggle', this, 'neutral')">📈 Trend Bullish</button>
+        <button class="toggle-btn" onclick="selectToggle('marketToggle', this, 'neutral')">📉 Trend Bearish</button>
+        <button class="toggle-btn" onclick="selectToggle('marketToggle', this, 'neutral')">↔️ Range / Sideways</button>
+        <button class="toggle-btn" onclick="selectToggle('marketToggle', this, 'neutral')">⚡ Volatilitas Tinggi</button>
+        <button class="toggle-btn" onclick="selectToggle('marketToggle', this, 'neutral')">🌫️ Volatilitas Rendah</button>
+        <button class="toggle-btn" onclick="selectToggle('marketToggle', this, 'neutral')">📰 News-Driven</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Bias Pra-Trade</div>
+      <textarea id="preBias" class="tall" placeholder="Jelaskan secara spesifik: Apa yang Anda ekspektasikan, berdasarkan sinyal/analisis apa, pada timeframe berapa, dan mengapa Anda percaya setup ini valid sebelum entry.&#10;&#10;Contoh: 'Ekspektasi bullish karena struktur HH/HL pada H4, dengan demand zone terkonfirmasi di 1920, confluence dengan 50 EMA. Tidak ada berita high-impact dalam 2 jam ke depan.'"></textarea>
+      <div class="hint">❌ Tidak akurat: "Saya pikir akan naik" — ✅ Akurat: Cantumkan sinyal spesifik dan alasan logisnya.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: EXECUTION AUDIT -->
+  <div class="section" id="sec1">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <span class="section-title">AUDIT EKSEKUSI</span>
+      <span class="section-desc">Evaluasi Kepatuhan Aturan — Tanpa Bias Outcome</span>
+    </div>
+
+    <div class="pattern-alert">
+      ⚠️ <strong>Peringatan:</strong> Bagian ini mengevaluasi kepatuhan terhadap aturan sistem Anda — BUKAN apakah trade menghasilkan profit atau loss. Profit dari eksekusi buruk tetap dianggap kegagalan sistem.
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apakah Setup Valid Berdasarkan Sistem Anda?</div>
+      <div class="toggle-group" id="setupValid">
+        <button class="toggle-btn" onclick="selectToggle('setupValid', this, 'yes')">✅ Ya</button>
+        <button class="toggle-btn" onclick="selectToggle('setupValid', this, 'no')">❌ Tidak</button>
+        <button class="toggle-btn" onclick="selectToggle('setupValid', this, 'neutral')">⚠️ Sebagian</button>
+      </div>
+      <textarea id="setupValidReason" style="margin-top:10px;" placeholder="Jelaskan MENGAPA valid atau tidak valid. Referensikan kriteria spesifik dari sistem Anda (bukan perasaan).&#10;Contoh: 'Valid — semua 3 konfirmasi terpenuhi: struktur, momentum, volume. SL di bawah swing low.'"></textarea>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Kualitas Timing Entry</div>
+        <div class="toggle-group" id="entryTiming">
+          <button class="toggle-btn" onclick="selectToggle('entryTiming', this, 'yes')">🎯 Presisi</button>
+          <button class="toggle-btn" onclick="selectToggle('entryTiming', this, 'neutral')">⏰ Terlalu Awal</button>
+          <button class="toggle-btn" onclick="selectToggle('entryTiming', this, 'no')">🐢 Terlalu Lambat</button>
+        </div>
+        <textarea id="entryExplain" style="margin-top:10px;" placeholder="Jelaskan mengapa timing tersebut. Level berapa entry seharusnya? Apa yang menyebabkan deviasi?"></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Kepatuhan Risk Management</div>
+        <div class="toggle-group" id="rmAdherence">
+          <button class="toggle-btn" onclick="selectToggle('rmAdherence', this, 'yes')">✅ Patuh Penuh</button>
+          <button class="toggle-btn" onclick="selectToggle('rmAdherence', this, 'neutral')">⚠️ Sebagian</button>
+          <button class="toggle-btn" onclick="selectToggle('rmAdherence', this, 'no')">❌ Dilanggar</button>
+        </div>
+        <textarea id="rmExplain" style="margin-top:10px;" placeholder="Cantumkan: Risk % yang direncanakan vs aktual, posisi SL sesuai aturan atau tidak, apakah lot size dikalkulasi atau ditebak."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Kualitas Exit</div>
+      <div class="toggle-group" id="exitQuality">
+        <button class="toggle-btn" onclick="selectToggle('exitQuality', this, 'yes')">📋 Berbasis Aturan</button>
+        <button class="toggle-btn" onclick="selectToggle('exitQuality', this, 'no')">😰 Emosional</button>
+        <button class="toggle-btn" onclick="selectToggle('exitQuality', this, 'neutral')">⚡ Prematur</button>
+        <button class="toggle-btn" onclick="selectToggle('exitQuality', this, 'no')">🕐 Terlambat</button>
+      </div>
+      <textarea id="exitExplain" style="margin-top:10px;" placeholder="Deskripsikan momen exit: Harga exit? Target awal? Jika exit prematur/terlambat — apa yang memicu keputusan itu?"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Pelanggaran Aturan (jika ada)</div>
+      <textarea class="tall" id="ruleViolations" placeholder="Daftar SETIAP pelanggaran aturan yang terjadi. Format:&#10;— [Waktu/Momen]: [Aturan yang dilanggar] → [Alasan pelanggaran]&#10;&#10;Contoh:&#10;— Saat entry: Masuk tanpa menunggu close candle konfirmasi → Takut ketinggalan move&#10;— Saat hold: SL dipindah manual 15 pip lebih jauh → Berharap harga balik&#10;&#10;Tulis 'TIDAK ADA' jika benar-benar tidak ada pelanggaran."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 3: COGNITIVE STATE -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <span class="section-title">STATE KOGNITIF & PSIKOLOGIS</span>
+      <span class="section-desc">Identifikasi Interferensi Internal</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Kondisi Emosi Sebelum Trade</div>
+        <select id="emotionBefore">
+          <option value="">— Pilih —</option>
+          <option>Tenang / Netral</option>
+          <option>Fokus / Siap</option>
+          <option>Percaya Diri Berlebih</option>
+          <option>Cemas / Khawatir</option>
+          <option>Frustrasi (dari trade sebelumnya)</option>
+          <option>FOMO / Terburu-buru</option>
+          <option>Bosan / Tidak Sabar</option>
+          <option>Kelelahan / Tidak Fokus</option>
+          <option>Euforia</option>
+        </select>
+        <textarea id="emotionBeforeDetail" style="margin-top:8px;" placeholder="Jelaskan secara spesifik..."></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Kondisi Emosi Selama Trade</div>
+        <select id="emotionDuring">
+          <option value="">— Pilih —</option>
+          <option>Tenang / Objektif</option>
+          <option>Tegang / Tidak Nyaman</option>
+          <option>Panik saat floating loss</option>
+          <option>Serakah saat floating profit</option>
+          <option>Hopeful (berharap harga balik)</option>
+          <option>Tidak Peduli / Pasrah</option>
+          <option>Terlalu Sering Monitor Chart</option>
+        </select>
+        <textarea id="emotionDuringDetail" style="margin-top:8px;" placeholder="Jelaskan perubahan emosi saat hold posisi..."></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label"><span class="required">*</span> Kondisi Emosi Setelah Trade</div>
+        <select id="emotionAfter">
+          <option value="">— Pilih —</option>
+          <option>Puas (proses benar)</option>
+          <option>Lega (profit)</option>
+          <option>Kecewa (loss)</option>
+          <option>Marah</option>
+          <option>Dorongan Revenge Trade</option>
+          <option>Ingin Segera Entry Lagi</option>
+          <option>Netral / Terima</option>
+          <option>Kelelahan Mental</option>
+        </select>
+        <textarea id="emotionAfterDetail" style="margin-top:8px;" placeholder="Apakah ada dorongan untuk langsung entry ulang?"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Deteksi Bias Kognitif (pilih semua yang aktif)</div>
+      <div class="bias-grid" id="biasGrid">
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="FOMO (Fear of Missing Out)">
+          <div class="bias-dot"></div>FOMO
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Revenge Trading">
+          <div class="bias-dot"></div>Revenge Trading
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Overconfidence">
+          <div class="bias-dot"></div>Overconfidence
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Hesitation (Ragu-ragu)">
+          <div class="bias-dot"></div>Hesitation
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Confirmation Bias">
+          <div class="bias-dot"></div>Confirmation Bias
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Loss Aversion">
+          <div class="bias-dot"></div>Loss Aversion
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Anchoring Bias">
+          <div class="bias-dot"></div>Anchoring Bias
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Recency Bias">
+          <div class="bias-dot"></div>Recency Bias
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Overtrading">
+          <div class="bias-dot"></div>Overtrading
+        </div>
+        <div class="bias-item" onclick="toggleBias(this)" data-bias="Tidak Ada Bias Terdeteksi">
+          <div class="bias-dot"></div>Tidak Ada Bias
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apakah Emosi Mengubah Eksekusi?</div>
+      <div class="toggle-group" id="emotionAlter">
+        <button class="toggle-btn" onclick="selectToggle('emotionAlter', this, 'yes')">✅ Ya</button>
+        <button class="toggle-btn" onclick="selectToggle('emotionAlter', this, 'no')">❌ Tidak</button>
+      </div>
+      <textarea id="emotionAlterDetail" style="margin-top:10px;" placeholder="Jika ya — Deskripsikan TEPAT DI MANA emosi mengintervensi eksekusi:&#10;Contoh: 'Saat harga menyentuh SL -5 pip, saya panik dan menutup posisi manual sebelum harga revert kembali ke arah target.'&#10;&#10;Jika tidak — Konfirmasi bahwa seluruh eksekusi dilakukan sesuai rencana."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 4: PERFORMANCE BREAKDOWN -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <span class="section-title">BREAKDOWN PERFORMA</span>
+      <span class="section-desc">Pisahkan Skill vs Perilaku</span>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apa yang Dilakukan dengan BENAR (Spesifik & Dapat Diulang)</div>
+      <textarea class="tall" id="doneCorrect" placeholder="Daftarkan hanya tindakan yang spesifik dan dapat direplikasi. Bukan 'saya trading dengan baik.'&#10;&#10;Contoh:&#10;— Entry tepat di level demand zone setelah konfirmasi engulfing candle M15&#10;— SL ditempatkan 5 pip di bawah swing low struktur, bukan level psikologis&#10;— Tidak menambah posisi saat floating loss (sesuai aturan)"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apa yang Gagal Karena SALAH ANALISIS TEKNIKAL</div>
+      <textarea id="failedTechnical" placeholder="Hanya cantumkan kegagalan yang bersumber dari pemahaman teknikal yang salah — bukan emosi.&#10;&#10;Contoh: 'Salah mengidentifikasi market structure — mengira downtrend padahal masih fase retracement.'&#10;&#10;Tulis 'TIDAK ADA' jika tidak relevan."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apa yang Gagal Karena ERROR PERILAKU / PSIKOLOGIS</div>
+      <textarea id="failedBehavioral" placeholder="Hanya cantumkan kegagalan yang bersumber dari perilaku atau emosi — bukan teknikal.&#10;&#10;Contoh: 'Tahu setup tidak valid tapi tetap masuk karena takut ketinggalan (FOMO).'&#10;&#10;Tulis 'TIDAK ADA' jika tidak relevan."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apakah Outcome Selaras dengan Proses?</div>
+      <div class="toggle-group" id="outcomeAligned">
+        <button class="toggle-btn" onclick="selectToggle('outcomeAligned', this, 'yes')">✅ Ya (Proses Baik → Hasil Baik)</button>
+        <button class="toggle-btn" onclick="selectToggle('outcomeAligned', this, 'no')">❌ Tidak (Proses Buruk → Hasil Baik atau Proses Baik → Loss)</button>
+        <button class="toggle-btn" onclick="selectToggle('outcomeAligned', this, 'neutral')">⚠️ Sebagian</button>
+      </div>
+      <textarea id="outcomeExplain" style="margin-top:10px;" placeholder="Jelaskan. Ingat: Profit dari setup buruk adalah 'lucky outcome', bukan validasi sistem."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 5: EDGE VALIDATION -->
+  <div class="section" id="sec4">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <span class="section-title">LAPISAN VALIDASI EDGE</span>
+      <span class="section-desc">Tentukan: Sistem atau Trader yang Bermasalah?</span>
+    </div>
+
+    <div class="pattern-alert">
+      ⚡ <strong>Tujuan:</strong> Memisahkan masalah pada sistem trading Anda vs masalah pada eksekusi Anda. Ini adalah pemisahan kritis untuk perbaikan yang tepat sasaran.
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apakah Kondisi Pasar Sesuai dengan Edge Anda?</div>
+      <div class="toggle-group" id="edgeMatch">
+        <button class="toggle-btn" onclick="selectToggle('edgeMatch', this, 'yes')">✅ Ya — Kondisi Sesuai</button>
+        <button class="toggle-btn" onclick="selectToggle('edgeMatch', this, 'no')">❌ Tidak — Kondisi Tidak Sesuai</button>
+        <button class="toggle-btn" onclick="selectToggle('edgeMatch', this, 'neutral')">⚠️ Tidak Pasti</button>
+      </div>
+      <textarea id="edgeMatchReason" style="margin-top:10px;" placeholder="Jelaskan: Kondisi pasar apa yang dibutuhkan edge Anda? Kondisi aktual saat itu?&#10;&#10;Jika YA → Apakah eksekusi sudah benar? Detail di bawah.&#10;Jika TIDAK → Mengapa Anda tetap trading? Apa yang memicu entry di luar kondisi ideal?"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Klasifikasi Kasus Ini</div>
+      <div class="verdict-grid" id="edgeCase">
+        <div class="verdict-option" onclick="selectVerdict('edgeCase', this)">
+          <div class="verdict-title">✅ Edge Valid + Eksekusi Buruk</div>
+          <div class="verdict-desc">Setup ada, kondisi tepat, tapi pelaksanaan menyimpang dari aturan sistem.</div>
+        </div>
+        <div class="verdict-option" onclick="selectVerdict('edgeCase', this)">
+          <div class="verdict-title">⚠️ Edge Invalid + Eksekusi Benar</div>
+          <div class="verdict-desc">Eksekusi mengikuti aturan, tapi kondisi pasar tidak mendukung edge Anda.</div>
+        </div>
+        <div class="verdict-option" onclick="selectVerdict('edgeCase', this)">
+          <div class="verdict-title">❌ Keduanya Salah</div>
+          <div class="verdict-desc">Kondisi tidak tepat DAN eksekusi menyimpang. Kasus paling kritis.</div>
+        </div>
+        <div class="verdict-option" onclick="selectVerdict('edgeCase', this)">
+          <div class="verdict-title">✅ Edge Valid + Eksekusi Benar</div>
+          <div class="verdict-desc">Setup ideal. Jika loss → kemungkinan variance normal, bukan kesalahan sistem.</div>
+        </div>
+      </div>
+      <textarea id="edgeCaseJustify" style="margin-top:10px;" placeholder="Justifikasi pilihan Anda dengan data/observasi spesifik, bukan perasaan."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 6: PATTERN DETECTION -->
+  <div class="section" id="sec5">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <span class="section-title">DETEKSI POLA</span>
+      <span class="section-desc">Identifikasi Perilaku Berulang</span>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apakah Kesalahan Ini Berulang?</div>
+      <div class="toggle-group" id="isRecurring">
+        <button class="toggle-btn" onclick="selectToggle('isRecurring', this, 'no')">✅ Tidak — Pertama Kali</button>
+        <button class="toggle-btn" onclick="selectToggle('isRecurring', this, 'neutral')">⚠️ Pernah Terjadi (1-2x)</button>
+        <button class="toggle-btn" onclick="selectToggle('isRecurring', this, 'no')">❌ Berulang (3x+)</button>
+        <button class="toggle-btn" onclick="selectToggle('isRecurring', this, 'no')">🚨 Sangat Sering</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Definisi Pola (Jika Berulang)</div>
+      <textarea class="tall" id="patternDef" placeholder="Deskripsikan pola secara tepat dan dapat diidentifikasi. Format:&#10;'Setiap kali [kondisi X], saya cenderung [melakukan Y], yang menyebabkan [outcome Z].'&#10;&#10;Contoh:&#10;'Setiap kali sesi London baru dibuka dan ada move besar, saya cenderung entry impulsif tanpa menunggu konfirmasi, yang menyebabkan SL terkena pada retracement awal.'&#10;&#10;Tulis 'TIDAK RELEVAN' jika kesalahan pertama kali terjadi."></textarea>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Kapan Biasanya Terjadi?</div>
+        <textarea id="patternWhen" placeholder="Spesifikasikan: Waktu (jam berapa), kondisi pasar apa, setelah event apa?&#10;&#10;Contoh: 'Biasanya terjadi 30 menit setelah rilis data NFP, saat market volatilitas tinggi.'"></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label">Apa yang Memicunya?</div>
+        <textarea id="patternTrigger" placeholder="Identifikasi trigger spesifik: chart setup, emosi, waktu, atau kondisi internal tertentu yang mengawali pola ini.&#10;&#10;Contoh: 'Dipicu oleh melihat candle besar terbentuk tanpa posisi — rasa takut ketinggalan.'"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: STRENGTH VS WEAKNESS -->
+  <div class="section" id="sec6">
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <span class="section-title">PETA KEKUATAN vs KELEMAHAN</span>
+      <span class="section-desc">Pemetaan Konsistensi Performa</span>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--green);">
+      <div class="card-label" style="color:var(--green);">💪 KEKUATAN — Perilaku yang Konsisten Menghasilkan Hasil Baik</div>
+      <textarea class="tall" id="strengths" placeholder="Daftarkan perilaku atau keputusan spesifik yang secara konsisten berkontribusi positif pada performa Anda.&#10;&#10;Contoh:&#10;— Selalu menunggu konfirmasi M15 sebelum entry di level H4&#10;— Tidak pernah menambah posisi yang sedang floating loss&#10;— Konsisten menjaga risk per trade ≤1.5% dari modal&#10;&#10;Jangan cantumkan yang hanya terjadi sekali."></textarea>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--red);">
+      <div class="card-label" style="color:var(--red);">⚠️ KELEMAHAN — Perilaku yang Konsisten Merusak Performa</div>
+      <textarea class="tall" id="weaknesses" placeholder="Daftarkan kelemahan berulang yang berdampak negatif pada performa.&#10;&#10;Contoh:&#10;— Sering exit prematur saat floating +10 pip karena takut profit hilang&#10;— Sering revenge trade setelah 2 loss berturut-turut&#10;— Tidak bisa menahan diri dari trading saat kondisi ranging&#10;&#10;Jadilah spesifik dan jujur tanpa pembelaan diri."></textarea>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--yellow);">
+      <div class="card-label" style="color:var(--yellow);">🔍 BLIND SPOTS — Sesuatu yang Baru Disadari Setelah Review Ini</div>
+      <textarea id="blindspots" placeholder="Tulis insight yang BARU Anda sadari setelah melakukan review ini — yang tidak terpikirkan saat live trading.&#10;&#10;Ini adalah area pertumbuhan paling berharga. Jangan lewatkan bagian ini.&#10;&#10;Contoh: 'Baru sadar bahwa saya selalu oversize position saat market baru buka — bukan karena analisis lebih yakin, tapi karena adrenalin sesi baru.'"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 8: PRECISION CORRECTION -->
+  <div class="section" id="sec7">
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <span class="section-title">KOREKSI PRESISI</span>
+      <span class="section-desc">Ubah Analisis Menjadi Aturan Operasional</span>
+    </div>
+
+    <div class="pattern-alert">
+      🔧 <strong>Instruksi:</strong> Bagian ini bukan tentang niat baik atau motivasi. Setiap jawaban harus menghasilkan aturan yang SPESIFIK, TERUKUR, dan DAPAT DIEKSEKUSI.
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Aturan Apa yang Akan Ditambahkan atau Dimodifikasi?</div>
+      <textarea class="tall" id="newRule" placeholder="Tulis dalam format aturan yang jelas dan tidak ambigu:&#10;&#10;'Mulai sesi [X], saya WAJIB [melakukan Y] sebelum entry. Jika [kondisi Z] tidak terpenuhi, trade dibatalkan.'&#10;&#10;Contoh:&#10;'Aturan Baru: Setelah 2 loss berturut-turut dalam satu sesi, WAJIB stop trading dan tidak boleh entry lagi dalam 24 jam.'&#10;&#10;'Modifikasi: SL minimum 1.5x ATR dari entry, bukan berdasarkan perasaan 'cukup aman'.'"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apa yang Akan Dilakukan Berbeda pada Setup Identik Berikutnya?</div>
+      <textarea id="doNext" placeholder="Jelaskan perbedaan tindakan yang KONKRET jika setup yang sama muncul lagi.&#10;&#10;Bukan: 'Saya akan lebih sabar.'&#10;Ya: 'Saya akan menunggu close candle H1 penuh di atas resistance sebelum entry, bukan entry saat candle masih terbuka.'"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Apa yang Harus Dieliminasi Segera?</div>
+      <textarea id="eliminate" placeholder="Daftarkan perilaku, kebiasaan, atau tindakan spesifik yang harus BERHENTI SEKARANG.&#10;&#10;Contoh:&#10;— ELIMINASI: Entry tanpa konfirmasi volume (mulai berlaku hari ini)&#10;— ELIMINASI: Memindahkan SL saat trade sedang berjalan&#10;— ELIMINASI: Trading saat kelelahan atau emosi tidak stabil"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 9: FINAL VERDICT -->
+  <div class="section" id="sec8">
+    <div class="section-header">
+      <span class="section-number">09</span>
+      <span class="section-title">FINAL VERDICT</span>
+      <span class="section-desc">Kesimpulan Akhir Berdasarkan Logika</span>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Pilih Satu Verdict</div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="finalVerdict">
+        <div class="verdict-option" onclick="selectVerdict('finalVerdict', this)" style="border-color:var(--border);">
+          <div class="verdict-title">✅ Sistem Valid — Eksekusi Gagal</div>
+          <div class="verdict-desc">Edge terbukti ada. Kondisi pasar sesuai. Kegagalan murni dari deviasi eksekusi terhadap aturan sistem.</div>
+        </div>
+        <div class="verdict-option" onclick="selectVerdict('finalVerdict', this)" style="border-color:var(--border);">
+          <div class="verdict-title">⚠️ Eksekusi Benar — Sistem Lemah</div>
+          <div class="verdict-desc">Aturan diikuti sepenuhnya. Kegagalan disebabkan sistem yang belum memiliki edge yang valid atau belum teruji.</div>
+        </div>
+        <div class="verdict-option" onclick="selectVerdict('finalVerdict', this)" style="border-color:var(--border);">
+          <div class="verdict-title">❌ Keduanya Bermasalah</div>
+          <div class="verdict-desc">Sistem tidak memiliki edge yang jelas DAN eksekusi menyimpang dari aturan. Perlu audit fundamental.</div>
+        </div>
+        <div class="verdict-option" onclick="selectVerdict('finalVerdict', this)" style="border-color:var(--border);">
+          <div class="verdict-title">📊 Tidak Ada Kesimpulan — Data Tidak Cukup</div>
+          <div class="verdict-desc">Satu trade tidak cukup untuk menyimpulkan. Diperlukan sampel lebih besar (minimum 20-30 trade) untuk validasi.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="required">*</span> Justifikasi Verdict dengan Logika</div>
+      <textarea class="tall" id="verdictJustify" placeholder="Jelaskan MENGAPA Anda memilih verdict tersebut. Gunakan data dari bagian-bagian sebelumnya.&#10;&#10;Format yang direkomendasikan:&#10;'Verdict ini dipilih karena: [fakta 1] + [fakta 2] + [fakta 3].'&#10;&#10;❌ Tidak diterima: Alasan berdasarkan perasaan atau harapan.&#10;✅ Diterima: Alasan berdasarkan observasi perilaku dan data eksekusi."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Skor Sesi Ini (0–10)</div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <input type="range" id="sessionScore" min="0" max="10" value="5" style="flex:1;accent-color:var(--accent);">
+        <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--accent);min-width:36px;" id="scoreDisplay">5</div>
+      </div>
+      <div class="hint">0 = Semua aturan dilanggar, tidak ada yang bisa dipelajari | 10 = Eksekusi sempurna sesuai sistem</div>
+      <div style="margin-top:8px;">
+        <span class="badge badge-yellow" id="scoreLabel">Sedang</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 10: EXPORT -->
+  <div class="section" id="sec9">
+    <div class="section-header">
+      <span class="section-number">10</span>
+      <span class="section-title">EXPORT & SIMPAN</span>
+      <span class="section-desc">Generate Laporan Audit</span>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="generateReport()">⚙️ Generate Laporan</button>
+      <button class="btn btn-success" onclick="copyReport()">📋 Salin ke Clipboard</button>
+      <button class="btn btn-secondary" onclick="downloadReport()">💾 Download .txt</button>
+      <button class="btn btn-danger" onclick="resetAll()">🗑️ Reset Semua</button>
+    </div>
+
+    <div class="export-area" id="exportArea">// Klik "Generate Laporan" untuk melihat hasil audit sesi ini...</div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="btn btn-secondary" id="prevBtn" onclick="navigate(-1)" style="display:none;">← Sebelumnya</button>
+    <div style="font-size:12px;color:var(--text-muted);" id="stepLabel">Bagian 1 dari 10</div>
+    <button class="btn btn-primary" id="nextBtn" onclick="navigate(1)">Selanjutnya →</button>
+  </div>
+</div>
+
+<script>
+let currentSection = 0;
+const totalSections = 10;
+const selectedVerdicts = {};
+
+// INIT
+window.onload = () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tradeDate').value = today;
+  document.getElementById('sessionId').value = 'TRD-' + String(Math.floor(Math.random()*900)+100);
+  buildProgress();
+  updateNav();
+
+  document.getElementById('sessionScore').addEventListener('input', function() {
+    const v = parseInt(this.value);
+    document.getElementById('scoreDisplay').textContent = v;
+    const label = document.getElementById('scoreLabel');
+    if (v <= 3) { label.textContent = 'Buruk'; label.className = 'badge badge-red'; }
+    else if (v <= 6) { label.textContent = 'Sedang'; label.className = 'badge badge-yellow'; }
+    else { label.textContent = 'Baik'; label.className = 'badge badge-green'; }
+  });
+};
+
+function buildProgress() {
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  for (let i = 0; i < totalSections; i++) {
+    const seg = document.createElement('div');
+    seg.className = 'progress-seg' + (i <= currentSection ? ' done' : '');
+    bar.appendChild(seg);
+  }
+}
+
+function goTo(index) {
+  document.querySelectorAll('.section').forEach((s, i) => {
+    s.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === index);
+  });
+  currentSection = index;
+  buildProgress();
+  updateNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function navigate(dir) {
+  const next = currentSection + dir;
+  if (next >= 0 && next < totalSections) goTo(next);
+}
+
+function updateNav() {
+  document.getElementById('prevBtn').style.display = currentSection === 0 ? 'none' : 'inline-block';
+  document.getElementById('nextBtn').style.display = currentSection === totalSections - 1 ? 'none' : 'inline-block';
+  document.getElementById('stepLabel').textContent = `Bagian ${currentSection + 1} dari ${totalSections}`;
+}
+
+function selectToggle(groupId, btn, type) {
+  document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(b => {
+    b.className = 'toggle-btn';
+  });
+  btn.classList.add('selected-' + type);
+}
+
+function selectVerdict(groupId, el) {
+  document.querySelectorAll(`#${groupId} .verdict-option`).forEach(v => v.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedVerdicts[groupId] = el.querySelector('.verdict-title').textContent;
+}
+
+function toggleBias(el) {
+  el.classList.toggle('active');
+}
+
+function getToggleSelected(groupId) {
+  const sel = document.querySelector(`#${groupId} .toggle-btn.selected-yes, #${groupId} .toggle-btn.selected-no, #${groupId} .toggle-btn.selected-neutral, #${groupId} .toggle-btn.selected-accent`);
+  return sel ? sel.textContent.trim() : '[Tidak dipilih]';
+}
+
+function getActiveBiases() {
+  return Array.from(document.querySelectorAll('#biasGrid .bias-item.active'))
+    .map(b => b.dataset.bias).join(', ') || '[Tidak ada bias dipilih]';
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  if (!el) return '[Tidak diisi]';
+  return el.value.trim() || '[Tidak diisi]';
+}
+
+function generateReport() {
+  const line = '─'.repeat(68);
+  const dline = '═'.repeat(68);
+  const date = val('tradeDate');
+  const sid = val('sessionId');
+  const score = document.getElementById('sessionScore').value;
+
+  const report = `
+${dline}
+  SISTEM AUDIT PERFORMA TRADING
+  Tanggal: ${date}  |  ID Sesi: ${sid}  |  Skor: ${score}/10
+${dline}
+
+${line}
+  [01] KONTEKS TRADE
+${line}
+  Instrumen         : ${val('instrument')}
+  Sesi              : ${getToggleSelected('sessionToggle')}
+  Kondisi Pasar     : ${getToggleSelected('marketToggle')}
+  
+  Bias Pra-Trade:
+  ${val('preBias').split('\n').join('\n  ')}
+
+${line}
+  [02] AUDIT EKSEKUSI
+${line}
+  Setup Valid?      : ${getToggleSelected('setupValid')}
+  Alasan            : ${val('setupValidReason')}
+
+  Timing Entry      : ${getToggleSelected('entryTiming')}
+  Penjelasan        : ${val('entryExplain')}
+
+  Risk Management   : ${getToggleSelected('rmAdherence')}
+  Detail            : ${val('rmExplain')}
+
+  Kualitas Exit     : ${getToggleSelected('exitQuality')}
+  Penjelasan        : ${val('exitExplain')}
+
+  Pelanggaran Aturan:
+  ${val('ruleViolations').split('\n').join('\n  ')}
+
+${line}
+  [03] STATE KOGNITIF & PSIKOLOGIS
+${line}
+  Emosi Sebelum     : ${val('emotionBefore')} — ${val('emotionBeforeDetail')}
+  Emosi Selama      : ${val('emotionDuring')} — ${val('emotionDuringDetail')}
+  Emosi Sesudah     : ${val('emotionAfter')} — ${val('emotionAfterDetail')}
+
+  Bias Terdeteksi   : ${getActiveBiases()}
+
+  Emosi Ubah Eksekusi? : ${getToggleSelected('emotionAlter')}
+  Detail            : ${val('emotionAlterDetail')}
+
+${line}
+  [04] BREAKDOWN PERFORMA
+${line}
+  Yang Dilakukan Benar:
+  ${val('doneCorrect').split('\n').join('\n  ')}
+
+  Gagal — Teknikal  :
+  ${val('failedTechnical').split('\n').join('\n  ')}
+
+  Gagal — Perilaku  :
+  ${val('failedBehavioral').split('\n').join('\n  ')}
+
+  Outcome ≈ Proses? : ${getToggleSelected('outcomeAligned')}
+  Penjelasan        : ${val('outcomeExplain')}
+
+${line}
+  [05] VALIDASI EDGE
+${line}
+  Kondisi Sesuai Edge? : ${getToggleSelected('edgeMatch')}
+  Penjelasan           : ${val('edgeMatchReason')}
+
+  Klasifikasi Kasus    : ${selectedVerdicts['edgeCase'] || '[Tidak dipilih]'}
+  Justifikasi          : ${val('edgeCaseJustify')}
+
+${line}
+  [06] DETEKSI POLA
+${line}
+  Kesalahan Berulang? : ${getToggleSelected('isRecurring')}
+
+  Definisi Pola:
+  ${val('patternDef').split('\n').join('\n  ')}
+
+  Kapan Terjadi     : ${val('patternWhen')}
+  Trigger           : ${val('patternTrigger')}
+
+${line}
+  [07] PETA KEKUATAN vs KELEMAHAN
+${line}
+  KEKUATAN:
+  ${val('strengths').split('\n').join('\n  ')}
+
+  KELEMAHAN:
+  ${val('weaknesses').split('\n').join('\n  ')}
+
+  BLIND SPOTS:
+  ${val('blindspots').split('\n').join('\n  ')}
+
+${line}
+  [08] KOREKSI PRESISI
+${line}
+  Aturan Baru/Modifikasi:
+  ${val('newRule').split('\n').join('\n  ')}
+
+  Tindakan Berbeda Berikutnya:
+  ${val('doNext').split('\n').join('\n  ')}
+
+  Yang Harus Dieliminasi:
+  ${val('eliminate').split('\n').join('\n  ')}
+
+${line}
+  [09] FINAL VERDICT
+${line}
+  Verdict           : ${selectedVerdicts['finalVerdict'] || '[Tidak dipilih]'}
+  
+  Justifikasi:
+  ${val('verdictJustify').split('\n').join('\n  ')}
+
+  Skor Sesi         : ${score}/10
+
+${dline}
+  END OF AUDIT — ${date} — ${sid}
+${dline}
+`.trim();
+
+  document.getElementById('exportArea').textContent = report;
+}
+
+function copyReport() {
+  const text = document.getElementById('exportArea').textContent;
+  if (text.startsWith('//')) { alert('Generate laporan terlebih dahulu.'); return; }
+  navigator.clipboard.writeText(text).then(() => alert('✅ Laporan disalin ke clipboard!')).catch(() => alert('Gagal menyalin. Coba select & copy manual.'));
+}
+
+function downloadReport() {
+  const text = document.getElementById('exportArea').textContent;
+  if (text.startsWith('//')) { alert('Generate laporan terlebih dahulu.'); return; }
+  const sid = val('sessionId').replace(/[^a-zA-Z0-9-_]/g, '_');
+  const date = val('tradeDate');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `audit_trading_${date}_${sid}.txt`;
+  a.click();
+}
+
+function resetAll() {
+  if (!confirm('Reset semua data? Tindakan ini tidak dapat dibatalkan.')) return;
+  document.querySelectorAll('textarea, input[type="text"]').forEach(el => el.value = '');
+  document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  document.querySelectorAll('.toggle-btn').forEach(b => b.className = 'toggle-btn');
+  document.querySelectorAll('.verdict-option').forEach(v => v.classList.remove('selected'));
+  document.querySelectorAll('.bias-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('sessionScore').value = 5;
+  document.getElementById('scoreDisplay').textContent = '5';
+  document.getElementById('exportArea').textContent = '// Klik "Generate Laporan" untuk melihat hasil audit sesi ini...';
+  Object.keys(selectedVerdicts).forEach(k => delete selectedVerdicts[k]);
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tradeDate').value = today;
+  document.getElementById('sessionId').value = 'TRD-' + String(Math.floor(Math.random()*900)+100);
+  goTo(0);
+}
+</script>
+</body>
+</html>
